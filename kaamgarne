@@ -1,0 +1,130 @@
+// Arduino Mega
+en1 = 7; // Left Motor enable
+en2 = 8; // Right Motor Enable
+in1 = 9;
+in2 = 10;
+in3 = 11;
+in4 = 12;
+int s1,s2,s3,s4,s5,s6;
+bool canleft,canright,canforward;
+int stackarray[10][1] ;
+int left = 1,forward = 2,right = 3, backward = 4;
+int stackpointer = 0,decisionindex = 0;
+void setup()
+{
+    pinMode(en1,OUTPUT);
+    pinMode(en2,OUTPUT);
+    pinMode(in1,OUTPUT);
+    pinMode(in2,OUTPUT);
+    pinMode(in3,OUTPUT);
+    pinMode(in4,OUTPUT);
+    pinMode(2,INPUT);
+    pinMode(3,INPUT);
+    pinMode(4,INPUT);
+    pinMode(5,INPUT);
+    pinMode(6,INPUT);
+    analogWrite(en1,0);
+    analogWrite(en2,0);
+}
+void loop()
+{
+    s1 = digitalRead(2);
+    s2 = digitalRead(3);
+    s3 = digitalRead(4);
+    s4 = digitalRead(5);
+    s5 = digitalRead(6);
+    if(s1 || s2)
+    {
+        canleft = true;
+    }
+    else
+    {
+        canleft = false;
+    }
+    if(s3 || s4)
+    {
+        canright = true;
+    }
+    else
+    {
+        canright = false;
+    }
+    if(s3)
+    {
+        canforward = true;
+    }
+    else
+    {
+        canforward = false;
+    }
+    if((canleft && canforward) || (canright && canforward) || (canleft&&canright))
+    {
+        nodedetected();
+    }
+    else
+    {
+        moveforward();
+    }
+}
+void nodedetected()
+{
+    digitalWrite(en1,0);
+    digitalWrite(en2,0);
+    delay(2500);
+    int prevdecision = stackarray[stackpointer][decisionindex]
+    if(canleft && prevdecision!=right)
+    {
+        stackarray[stackpointer][decisionindex] = left;
+        stackpointer++;
+        turnleft();
+    }
+    else if(canright && prevdecision!=left)
+    {
+        stackarray[stackpointer][decisionindex] = right;
+        stackpointer++;
+        turnright();
+    }
+    else
+    {
+        stackarray[stackpointer][decisionindex] = forward;
+        stackpointer++;
+        moveforward();
+    }
+}
+void deadenddetected()
+{
+    analogWrite(en1,uturnspeed);
+    analogWrite(en2,uturnspeed);
+    digitalWrite(in1,HIGH);
+    digitalWrite(in2,LOW);
+    digitalWrite(in3,LOW);
+    digitalWrite(in4,HIGH);
+    stackpointer--;
+}
+void moveforward()
+{
+    analogWrite(en1,forwardspeed);
+    analogWrite(en2,forwardspeed);
+    digitalWrite(in1,LOW);
+    digitalWrite(in2,HIGH);
+    digitalWrite(in3,LOW);
+    digitalWrite(in4,HIGH);
+}
+void turnleft()
+{
+    analogWrite(en1,0); // Stop The left Motor
+    analogWrite(en2,turnleftspeed); // Move The Right Motor
+    digitalWrite(in1,LOW);
+    digitalWrite(in2,LOW); 
+    digitalWrite(in3,LOW); 
+    digitalWrite(in4,HIGH);
+}
+void turnright()
+{
+    analogWrite(en1,rightturnspeed);
+    analogWrite(en2,0);
+    digitalWrite(in1,LOW);
+    digitalWrite(in2,HIGH);
+    digitalWrite(in3,LOW);
+    digitalWrite(in4,LOW);
+}
